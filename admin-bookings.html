@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>All Bookings | Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<header class="admin-header">
+  <h2>All Bookings</h2>
+</header>
+
+<nav class="admin-nav">
+  <a href="admin-dashboard.html">Dashboard</a>
+  <a href="admin-manage-bus.html">Manage Bus</a>
+  <a href="admin-bookings.html" class="active">Bookings</a>
+</nav>
+
+<section class="content">
+
+  <table border="1" width="100%" cellpadding="10">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Bus Number</th>
+        <th>Seats</th>
+        <th>Total</th>
+        <th>Travel Date</th>
+      </tr>
+    </thead>
+
+    <tbody id="bookingTable">
+      <tr>
+        <td colspan="6" style="text-align:center;">Loading...</td>
+      </tr>
+    </tbody>
+  </table>
+
+</section>
+
+<script>
+
+// 🔥 Load bookings from backend
+async function loadBookings() {
+  const table = document.getElementById("bookingTable");
+
+  try {
+    const response = await fetch("/api/admin/bookings");
+
+    if (!response.ok) {
+      throw new Error("Server error");
+    }
+
+    const bookings = await response.json();
+
+    table.innerHTML = "";
+
+    if (bookings.length === 0) {
+      table.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center;">
+            No bookings found
+          </td>
+        </tr>`;
+      return;
+    }
+
+    bookings.forEach(b => {
+      const seats = Array.isArray(b.seats)
+        ? b.seats.join(", ")
+        : b.seats;
+
+      table.innerHTML += `
+        <tr>
+          <td>${b.name}</td>
+          <td>${b.email}</td>
+          <td>${b.busNumber}</td>
+          <td>${seats}</td>
+          <td>₹${b.totalAmount}</td>
+          <td>${b.travelDate}</td>
+        </tr>
+      `;
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    table.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center; color:red;">
+          Error loading bookings ❌ <br>
+          Make sure server is running
+        </td>
+      </tr>`;
+  }
+}
+
+// Auto load
+document.addEventListener("DOMContentLoaded", loadBookings);
+
+</script>
+
+</body>
+</html>

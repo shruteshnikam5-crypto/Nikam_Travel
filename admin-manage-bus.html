@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Bus | Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Premium Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="./admin.css">
+</head>
+
+<body>
+
+    <!-- ===== LOGIN PROTECTION ===== -->
+    <script>
+        if (localStorage.getItem("adminLogged") !== "true") {
+            window.location.replace("admin-login.html");
+        }
+    </script>
+
+    <!-- ===== HEADER ===== -->
+    <header class="admin-header">
+        <div class="header-left">
+            <h2>🚌 Nikam Travel Admin</h2>
+            <span class="admin-tag">Seat Management Panel</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </header>
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="admin-nav">
+        <a href="admin-dashboard.html">Dashboard</a>
+        <a href="admin-manage-bus.html" class="active">Manage Bus</a>
+        <a href="admin-bookings.html">Bookings</a>
+    </nav>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="admin-content">
+
+        <section class="dashboard-card">
+            <div class="card-header">
+                <h3>Lower Deck</h3>
+                <span class="deck-label">20 Seats</span>
+            </div>
+            <div id="lowerSeats" class="seat-box"></div>
+        </section>
+
+        <section class="dashboard-card">
+            <div class="card-header">
+                <h3>Upper Deck</h3>
+                <span class="deck-label">20 Seats</span>
+            </div>
+            <div id="upperSeats" class="seat-box"></div>
+        </section>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="admin-footer">
+        <p>© 2026 Nikam Travel | Premium Admin Panel</p>
+    </footer>
+
+    <!-- JS Files -->
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+
+</body>
+</html>

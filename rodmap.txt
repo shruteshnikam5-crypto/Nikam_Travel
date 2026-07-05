@@ -1,0 +1,37 @@
+project/
+│
+├── client/
+│   ├── index.html
+│   ├── route.html
+│   ├── seats.html
+│   ├── booking.html
+│   ├── style.css
+│   └── seats.js
+│
+├── admin/
+│   ├── admin.html
+│   ├── admin.js
+│   └── admin.css
+│
+└── data/
+    └── data.js   ❗ common data
+
+
+| Page            | Correct Name   |
+| --------------- | -------------- |
+| Home            | `index.html`   |
+| Route Select    | `route.html`   |
+| Seat Select     | `seat.html`    |
+| Booking Confirm | `booking.html` |
+| Contact         | `contact.html` |
+| User Login      | `login.html`   |
+
+| Page          | Correct Name            |
+| ------------- | ----------------------- |
+| Admin Login   | `admin-login.html`      |
+| Dashboard     | `admin-dashboard.html`  |
+| Manage Bus    | `admin-manage-bus.html` |
+| View Bookings | `admin-bookings.html`   |
+| JS            | `admin.js`              |
+| CSS           | `admin.css`             |
+

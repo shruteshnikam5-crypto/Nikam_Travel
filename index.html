@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nikam Travel | Premium Bus Booking</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="header">
+  <h2>🚌 Nikam Travel</h2>
+
+  <nav class="nav">
+
+    <!-- LEFT SIDE LINKS -->
+    <div class="nav-left">
+      <a href="index.html" class="active">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+      <a href="mybookings.html">My Bookings</a>
+    </div>
+
+    <!-- RIGHT SIDE ADMIN -->
+    <div class="nav-right">
+      <a href="admin-login.html" class="admin-btn">Admin</a>
+    </div>
+
+  </nav>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero-pro">
+
+  <div class="hero-left">
+    <h1>Travel Smart. Travel Safe.</h1>
+
+    <p>
+      Premium AC & Sleeper buses with comfortable seating  
+      and secure online booking experience.
+    </p>
+
+    <div class="hero-buttons">
+      <a href="#" class="btn-primary" onclick="goToBooking(event)">
+        <span>🚀 Book Ticket</span>
+      </a>
+
+      <a href="about.html" class="btn-outline">
+        Learn More
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <img src="pexels-safi-erneste-18029609.jpg" alt="Luxury Bus">
+  </div>
+
+</section>
+
+<!-- ================= FEATURES ================= -->
+<section class="features">
+
+  <h2>Why Choose Nikam Travel?</h2>
+
+  <div class="feature-grid">
+
+    <div class="feature-card">
+      <h3>🛡 Safe Journey</h3>
+      <p>Verified drivers & sanitized buses for your safety.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>💺 Comfortable Seats</h3>
+      <p>Pushback & sleeper seats for long distance comfort.</p>
+    </div>
+
+    <div class="feature-card">
+      <h3>⚡ Fast Booking</h3>
+      <p>Book tickets in under 2 minutes with smooth flow.</p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= ABOUT PREVIEW ================= -->
+<section class="about-home">
+
+  <h2>About Nikam Travel</h2>
+
+  <p>
+    Nikam Travel provides safe, comfortable, and affordable bus journeys
+    with easy online booking and trusted service across major cities.
+  </p>
+
+  <a href="about.html" class="btn">Read Full Story</a>
+
+</section>
+
+<!-- ================= CTA ================= -->
+<section class="features" style="background:#fff;">
+
+  <h2>Ready to Travel?</h2>
+  <p style="margin-bottom:20px;">
+    Book your seat now and enjoy a smooth journey.
+  </p>
+
+  <a href="#" class="btn-primary" onclick="goToBooking(event)">
+    <span>Book Now</span>
+  </a>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+  <p>© 2026 Nikam Travel. All Rights Reserved.</p>
+</footer>
+
+<!-- ================= SCRIPT ================= -->
+<script>
+function goToBooking(e){
+  e.preventDefault();
+
+  if(localStorage.getItem("isLoggedIn") !== "true"){
+    window.location.href = "login.html";
+  } else {
+    window.location.href = "route.html";
+  }
+}
+</script>
+
+</body>
+</html>

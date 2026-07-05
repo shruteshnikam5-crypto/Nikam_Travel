@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nikam Travel | Premium Routes</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <h2>🚌 Nikam Travel</h2>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="#" onclick="viewTicket()">My Ticket</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
+</header>
+
+<section class="route-pro">
+
+<h1>Search & Book Premium Buses</h1>
+
+<div class="route-box">
+
+  <input type="text" value="Chh. Sambhajinagar" disabled>
+
+  <select id="toCity">
+    <option value="">To</option>
+    <option>Pune</option>
+    <option>Mumbai</option>
+    <option>Delhi</option>
+  </select>
+
+  <input type="date" id="journeyDate">
+
+  <select id="busType">
+    <option value="">Bus Type</option>
+    <option value="AC">AC</option>
+    <option value="Non-AC">Non-AC</option>
+  </select>
+
+  <button class="search-btn" onclick="filterRoutes()">Find Bus</button>
+</div>
+
+<div id="routeList" class="route-list"></div>
+
+</section>
+
+<script>
+
+/* 🔐 LOGIN PROTECTION */
+if(localStorage.getItem("isLoggedIn") !== "true"){
+  alert("Please login first!");
+  window.location.href = "login.html";
+}
+
+/* 🚌 BUS DATA */
+const buses = [
+{
+  name:"Nikam Royal AC",
+  from:"Chh. Sambhajinagar",
+  to:"Pune",
+  type:"AC",
+  price:799,
+  time:"06:00 AM - 12:00 PM",
+  distance:"235 km",
+  description:"Luxury AC Sleeper with Charging & WiFi"
+},
+{
+  name:"Nikam Express",
+  from:"Chh. Sambhajinagar",
+  to:"Mumbai",
+  type:"AC",
+  price:899,
+  time:"09:00 PM - 05:00 AM",
+  distance:"330 km",
+  description:"Overnight AC Semi-Sleeper"
+},
+{
+  name:"Nikam Deluxe",
+  from:"Chh. Sambhajinagar",
+  to:"Delhi",
+  type:"AC",
+  price:1599,
+  time:"04:00 PM - 08:00 AM",
+  distance:"1200 km",
+  description:"Premium Long Distance Luxury Coach"
+},
+{
+  name:"Nikam Budget",
+  from:"Chh. Sambhajinagar",
+  to:"Pune",
+  type:"Non-AC",
+  price:599,
+  time:"08:00 AM - 02:00 PM",
+  distance:"235 km",
+  description:"Affordable Non-AC Comfortable Bus"
+}
+];
+
+/* 🚀 PAGE LOAD */
+window.onload = () => {
+  displayRoutes(buses);
+
+  const today = new Date().toISOString().split("T")[0];
+  const dateInput = document.getElementById("journeyDate");
+
+  dateInput.setAttribute("min", today);
+  dateInput.value = today;
+};
+
+/* 🔍 FILTER */
+function filterRoutes(){
+  const to = document.getElementById("toCity").value;
+  const type = document.getElementById("busType").value;
+  const date = document.getElementById("journeyDate").value;
+
+  const today = new Date().toISOString().split("T")[0];
+
+  if(!date){
+    alert("Please select travel date");
+    return;
+  }
+
+  if(date < today){
+    alert("Past date not allowed!");
+    return;
+  }
+
+  const filtered = buses.filter(bus =>
+    (!to || bus.to === to) &&
+    (!type || bus.type === type)
+  );
+
+  displayRoutes(filtered, date);
+}
+
+/* 🚌 DISPLAY */
+function displayRoutes(data, date=""){
+  const routeList = document.getElementById("routeList");
+  routeList.innerHTML = "";
+
+  if(data.length === 0){
+    routeList.innerHTML = "<p>No routes found.</p>";
+    return;
+  }
+
+  data.forEach(bus => {
+    const div = document.createElement("div");
+    div.className = "bus-card-pro";
+
+    div.innerHTML = `
+      <div class="bus-info">
+        <h3>${bus.name}</h3>
+        <p><strong>${bus.from} → ${bus.to}</strong></p>
+        <p>${bus.description}</p>
+        <p>🕒 ${bus.time}</p>
+        <p>📍 Distance: ${bus.distance}</p>
+        <p>💺 Type: ${bus.type}</p>
+        <p class="price">₹${bus.price}</p>
+      </div>
+
+      <div>
+        <button onclick="selectBus(
+          '${bus.name}',
+          ${bus.price},
+          '${date}',
+          '${bus.time}',
+          '${bus.distance}'
+        )">
+          Book Now
+        </button>
+      </div>
+    `;
+
+    routeList.appendChild(div);
+  });
+}
+
+/* 🔐 SELECT BUS */
+function selectBus(name, price, date, time, distance){
+
+  if(!date){
+    alert("Please select travel date");
+    return;
+  }
+
+  localStorage.setItem("selectedBus", name);
+  localStorage.setItem("seatPrice", price);
+  localStorage.setItem("travelDate", date);
+  localStorage.setItem("busTime", time);
+  localStorage.setItem("distance", distance);
+
+  window.location.href = "seat.html";
+}
+
+/* 🔓 LOGOUT */
+function logout(){
+  localStorage.clear();
+  window.location.href = "index.html";
+}
+
+/* 🎟 VIEW TICKET */
+function viewTicket(){
+  alert("Ticket feature coming soon!");
+}
+
+</script>
+
+</body>
+</html>

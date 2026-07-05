@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nikam Travel | Contact Us</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <h2>🚌 Nikam Travel</h2>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="route.html">Routes</a>
+    <a href="seat.html">Book Ticket</a>
+    <a href="contact.html" class="active">Contact</a>
+  </nav>
+</header>
+
+<section class="contact-section">
+
+  <h1>Contact & About Us</h1>
+
+  <div class="contact-container">
+
+    <!-- LEFT SIDE -->
+    <div class="contact-info">
+
+      <div class="contact-box">
+        <h3>About Nikam Travel</h3>
+        <p>
+          Nikam Travel provides safe, comfortable and affordable bus services
+          across Maharashtra. Our mission is to make online bus booking
+          simple, fast and reliable for everyone.
+        </p>
+      </div>
+
+      <div class="contact-box">
+        <h3>Contact Details</h3>
+        <p><strong>📞 Phone:</strong> +91 98765 43210</p>
+        <p><strong>📧 Email:</strong> nikamtravel@gmail.com</p>
+        <p>
+          <strong>💬 WhatsApp:</strong>
+          <a href="https://wa.me/919876543210" target="_blank">
+            Chat on WhatsApp
+          </a>
+        </p>
+        <p><strong>📍 Location:</strong> Pune, Maharashtra</p>
+      </div>
+
+    </div>
+
+    <!-- RIGHT SIDE FORM -->
+    <div class="contact-form">
+      <h3>Send Us Message</h3>
+
+      <form onsubmit="sendMessage(event)">
+        <input type="text" placeholder="Your Name" required>
+        <input type="email" placeholder="Your Email" required>
+        <textarea placeholder="Your Message" rows="5" required></textarea>
+        <button type="submit">Send Message</button>
+      </form>
+
+      <p id="successMsg" class="success-msg"></p>
+    </div>
+
+  </div>
+
+</section>
+
+<footer class="footer">
+  <p>© 2026 Nikam Travel. All Rights Reserved.</p>
+</footer>
+
+<script>
+function sendMessage(event) {
+  event.preventDefault();
+  document.getElementById("successMsg").innerText =
+    "✅ Message sent successfully! We will contact you soon.";
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nikam Travel | Seat Selection</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body>
+
+<header class="topbar">
+  🚌 Nikam Travel – Seat Selection
+</header>
+
+<h1 class="title">AC Sleeper (2+1)</h1>
+
+<div class="seat-container">
+
+  <div class="deck">
+    <h2>Lower Deck</h2>
+    <div class="seats" id="lower"></div>
+  </div>
+
+  <div class="deck">
+    <h2>Upper Deck</h2>
+    <div class="seats" id="upper"></div>
+  </div>
+
+</div>
+
+<div class="summary">
+  <h3>Seats: <span id="seatList">None</span></h3>
+  <h2>Total: ₹<span id="total">0</span></h2>
+
+  <button class="confirm-btn" onclick="confirmBooking()">
+    Pay & Book 💳
+  </button>
+
+  <br><br>
+
+  <button onclick="window.location.href='mybookings.html'">
+    View My Bookings
+  </button>
+</div>
+
+<script>
+
+const price = 8;
+const lower = document.getElementById("lower");
+const upper = document.getElementById("upper");
+const seatList = document.getElementById("seatList");
+const total = document.getElementById("total");
+
+let selectedSeats = [];
+
+/* 🔐 LOGIN CHECK */
+const userName = localStorage.getItem("userName");
+const userEmail = localStorage.getItem("userEmail");
+
+if (!userName || !userEmail || localStorage.getItem("isLoggedIn") !== "true") {
+  alert("Please login first!");
+  window.location.href = "login.html";
+}
+
+/* 🚌 BUS DETAILS */
+const busName = localStorage.getItem("selectedBus") || "Nikam Express";
+const travelDate = localStorage.getItem("travelDate") || new Date().toLocaleDateString();
+const busTime = localStorage.getItem("busTime") || "09:00 PM - 05:00 AM";
+const distance = localStorage.getItem("distance") || "300 km";
+const busNumber = "MH12AB1234";
+
+/* 🪑 CREATE SEATS */
+function createSeats(container, prefix) {
+  for (let i = 1; i <= 20; i++) {
+
+    const seat = document.createElement("div");
+    seat.className = "seat";
+    seat.innerText = prefix + i;
+
+    // demo random booked seats
+    if (Math.random() < 0.15) {
+      seat.classList.add("booked");
+    }
+
+    seat.onclick = () => {
+      if (seat.classList.contains("booked")) return;
+
+      seat.classList.toggle("selected");
+
+      const name = seat.innerText;
+
+      if (selectedSeats.includes(name)) {
+        selectedSeats = selectedSeats.filter(s => s !== name);
+      } else {
+        selectedSeats.push(name);
+      }
+
+      updateSummary();
+    };
+
+    container.appendChild(seat);
+  }
+}
+
+/* 📊 UPDATE SUMMARY */
+function updateSummary() {
+  seatList.innerText = selectedSeats.length ? selectedSeats.join(", ") : "None";
+  total.innerText = selectedSeats.length * price;
+}
+
+/* 💳 PAYMENT + BOOKING */
+async function confirmBooking() {
+
+  if (selectedSeats.length === 0) {
+    alert("Select at least one seat!");
+    return;
+  }
+
+  const totalAmount = selectedSeats.length * price;
+
+  const bookingData = {
+    name: userName,
+    email: userEmail,
+    busNumber: busNumber,
+    travelDate: travelDate,
+    seats: selectedSeats,
+    totalAmount: totalAmount
+  };
+
+  try {
+
+    // 🔥 1. CREATE ORDER
+    const res = await fetch("/api/create-order", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ amount: totalAmount })
+    });
+
+    const order = await res.json();
+
+    // 🔥 2. RAZORPAY OPEN
+    const options = {
+      key: "rzp_test_SaEwY3yCcRHU8m", // 👉 replace this
+      amount: order.amount,
+      currency: "INR",
+      name: "Nikam Travels",
+      description: "Bus Ticket Booking",
+      order_id: order.id,
+
+      handler: async function (response) {
+
+        // 🔥 3. VERIFY PAYMENT
+        const verify = await fetch("/api/verify-payment", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            ...response,
+            bookingData
+          })
+        });
+
+        const result = await verify.json();
+
+        if (result.success) {
+
+          // 📱 WhatsApp AFTER PAYMENT
+          const message =
+`🚌 Nikam Travel Ticket
+
+Name: ${userName}
+Bus: ${busName}
+Seats: ${selectedSeats.join(", ")}
+Total: ₹${totalAmount}
+Date: ${travelDate}`;
+
+          window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(message));
+
+          alert("✅ Payment Successful & Booking Confirmed!");
+          window.location.href = "mybookings.html";
+
+        } else {
+          alert("❌ Payment verification failed");
+        }
+      }
+    };
+
+    const rzp = new Razorpay(options);
+    rzp.open();
+
+  } catch (err) {
+    console.error(err);
+    alert("⚠️ Payment error");
+  }
+}
+
+/* 🚀 INIT */
+createSeats(lower, "L");
+createSeats(upper, "U");
+
+</script>
+
+</body>
+</html>

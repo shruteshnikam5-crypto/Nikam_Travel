@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Bookings | Nikam Travel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <h2>🚌 My Bookings</h2>
+  <a href="index.html" class="home-btn">Home</a>
+</header>
+
+<section class="route">
+
+  <h1>Your Tickets 🎫</h1>
+
+  <div id="bookingList"></div>
+
+</section>
+
+<script>
+
+// 🔐 LOGIN CHECK
+if(localStorage.getItem("isLoggedIn") !== "true"){
+  window.location.href = "login.html";
+}
+
+// 📊 LOAD BOOKINGS
+const data = JSON.parse(localStorage.getItem("bookings")) || [];
+const container = document.getElementById("bookingList");
+
+if(data.length === 0){
+  container.innerHTML = "<h3>No bookings yet 😢</h3>";
+}else{
+  data.forEach(b => {
+    const div = document.createElement("div");
+    div.className = "bus-card";
+
+    div.innerHTML = `
+      <h3>${b.bus}</h3>
+      <p><b>Name:</b> ${b.name}</p>
+      <p><b>Email:</b> ${b.email}</p>
+      <p><b>Bus No:</b> ${b.busNo}</p>
+      <p><b>Time:</b> ${b.time}</p>
+      <p><b>Seats:</b> ${b.seats.join(", ")}</p>
+      <p><b>Total:</b> ₹${b.total}</p>
+      <p><b>Date:</b> ${b.date}</p>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+</script>
+
+</body>
+</html>

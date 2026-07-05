@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nikam Travel | Secure Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <h2>🚌 Nikam Travel</h2>
+  <nav>
+    <a href="index.html">Home</a>
+  </nav>
+</header>
+
+<section class="auth-pro">
+
+  <div class="auth-left">
+    <h1>Welcome Back 👋</h1>
+    <p>Secure login & instant booking experience.</p>
+    <img src="pexels-safi-erneste-18029609.jpg" alt="Bus">
+  </div>
+
+  <div class="auth-box">
+    <div class="form-slider" id="formSlider">
+
+      <!-- REGISTER -->
+      <form class="auth-form">
+        <h2>Create Account</h2>
+
+        <input type="text" id="rname" placeholder="Full Name" required>
+        <input type="number" id="rage" placeholder="Age" required>
+        <input type="tel" id="rmobile" placeholder="Mobile Number" required>
+        <input type="email" id="remail" placeholder="Email Address" required>
+        <input type="password" id="rpassword" placeholder="Password" required>
+
+        <button type="button" onclick="registerUser()">Register</button>
+
+        <p>Already have account?
+          <span onclick="slideToLogin()">Login</span>
+        </p>
+      </form>
+
+      <!-- LOGIN -->
+      <form class="auth-form">
+        <h2>Login Account</h2>
+
+        <input type="tel" id="lmobile" placeholder="Mobile Number" required>
+        <input type="password" id="lpassword" placeholder="Password" required>
+
+        <button type="button" onclick="loginUser()">Login</button>
+
+        <p>Don't have account?
+          <span onclick="slideToRegister()">Register</span>
+        </p>
+      </form>
+
+    </div>
+  </div>
+
+</section>
+
+<footer class="footer">
+  <p>© 2026 Nikam Travel. All Rights Reserved.</p>
+</footer>
+
+<script>
+
+/* 🔥 AUTO REDIRECT IF ALREADY LOGGED IN */
+if(localStorage.getItem("isLoggedIn") === "true"){
+  window.location.href = "route.html";
+}
+
+/* ===== SLIDER ===== */
+function slideToLogin() {
+  document.getElementById('formSlider').style.transform = 'translateX(-400px)';
+}
+
+function slideToRegister() {
+  document.getElementById('formSlider').style.transform = 'translateX(0)';
+}
+
+/* ===== REGISTER ===== */
+function registerUser() {
+
+  const name = document.getElementById("rname").value.trim();
+  const age = parseInt(document.getElementById("rage").value);
+  const mobile = document.getElementById("rmobile").value.trim();
+  const email = document.getElementById("remail").value.trim();
+  const password = document.getElementById("rpassword").value;
+
+  if (!name || !age || !mobile || !email || !password) {
+    alert("Fill all fields ⚠️");
+    return;
+  }
+
+  if (age < 18) {
+    alert("Age must be 18+ ❌");
+    return;
+  }
+
+  if (mobile.length !== 10) {
+    alert("Enter valid 10 digit mobile number ❌");
+    return;
+  }
+
+  if (password.length < 4) {
+    alert("Password must be at least 4 characters ❌");
+    return;
+  }
+
+  // 🔥 Prevent duplicate user
+  if(localStorage.getItem("user")){
+    alert("User already registered ⚠️");
+    return;
+  }
+
+  const user = { name, age, mobile, email, password };
+  localStorage.setItem("user", JSON.stringify(user));
+
+  alert("Registration Successful ✅");
+  slideToLogin();
+}
+
+/* ===== LOGIN ===== */
+function loginUser() {
+
+  const mobile = document.getElementById("lmobile").value.trim();
+  const password = document.getElementById("lpassword").value;
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!user) {
+    alert("No account found. Please register first ❌");
+    return;
+  }
+
+  if (user.mobile === mobile && user.password === password) {
+
+    // ✅ Save session
+    localStorage.setItem("isLoggedIn", "true");
+
+    // ✅ Save user data
+    localStorage.setItem("userName", user.name);
+    localStorage.setItem("userEmail", user.email);
+    localStorage.setItem("userAge", user.age);
+
+    alert("Login Successful ✅");
+
+    window.location.href = "route.html";
+
+  } else {
+    alert("Invalid Mobile or Password ❌");
+  }
+}
+
+</script>
+
+</body>
+</html>

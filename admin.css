@@ -1,0 +1,332 @@
+/* =========================
+   RESET
+========================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #eef2ff, #f8fafc);
+    min-height: 100vh;
+}
+
+/* =========================
+   HEADER
+========================= */
+.admin-header {
+    background: linear-gradient(90deg, #1e3a8a, #2563eb);
+    color: white;
+    padding: 18px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.admin-header h2 {
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+.admin-nav {
+    background: rgba(17, 24, 39, 0.95);
+    padding: 14px;
+    text-align: center;
+    backdrop-filter: blur(8px);
+}
+
+.admin-nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 20px;
+    font-weight: 500;
+    position: relative;
+    transition: 0.3s;
+}
+
+.admin-nav a::after {
+    content: "";
+    width: 0%;
+    height: 2px;
+    background: #facc15;
+    position: absolute;
+    left: 0;
+    bottom: -5px;
+    transition: 0.3s;
+}
+
+.admin-nav a:hover::after,
+.admin-nav a.active::after {
+    width: 100%;
+}
+
+/* =========================
+   CONTENT AREA
+========================= */
+.admin-content {
+    padding: 50px 60px;
+}
+
+.dashboard-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    border-radius: 16px;
+    margin-bottom: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+/* =========================
+   GRID CARDS
+========================= */
+.dashboard-grid {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.card {
+    flex: 1;
+    min-width: 260px;
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.card-btn,
+.logout-btn,
+.btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.card-btn {
+    background: linear-gradient(90deg, #2563eb, #1e40af);
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 12px;
+}
+
+.card-btn:hover {
+    transform: scale(1.05);
+}
+
+.logout-btn {
+    background: linear-gradient(90deg, #ef4444, #b91c1c);
+    color: white;
+}
+
+.logout-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Table Buttons */
+.btn-edit {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-delete {
+    background: #ef4444;
+    color: white;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+}
+
+/* =========================
+   TABLE
+========================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+table th {
+    background: linear-gradient(90deg, #1e3a8a, #2563eb);
+    color: white;
+    padding: 14px;
+    font-weight: 500;
+}
+
+table td {
+    padding: 14px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+table tr:hover {
+    background: #f3f4f6;
+}
+
+/* =========================
+   FOOTER
+========================= */
+.admin-footer {
+    text-align: center;
+    padding: 18px;
+    margin-top: 50px;
+    background: #e5e7eb;
+    font-size: 14px;
+    color: #555;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+    .admin-content {
+        padding: 30px;
+    }
+
+    .dashboard-grid {
+        flex-direction: column;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+/* ===== LOGIN PAGE ===== */
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3a8a, #2563eb);
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.login-card {
+    background: white;
+    padding: 35px;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    text-align: center;
+}
+
+.login-card h2 {
+    margin-bottom: 10px;
+}
+
+.login-subtitle {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 25px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 18px;
+}
+
+.input-group label {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #2563eb, #1e40af);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.login-btn:hover {
+    transform: scale(1.05);
+}
+
+.error-message {
+    color: red;
+    font-size: 13px;
+    margin-top: 10px;
+}
+.seat-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.seat {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.available {
+    background: #d1d5db;
+}
+
+.booked {
+    background: #ef4444;
+    color: white;
+}
+
+.seat:hover {
+    transform: scale(1.1);
+}

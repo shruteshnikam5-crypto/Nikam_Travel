@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Manage Bus | Admin</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<h2>🚌 Manage Buses</h2>
+
+<div class="nav">
+  <a href="admin-dashboard.html">Dashboard</a>
+  <a href="bookings.html">Bookings</a>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<input type="text" id="busName" placeholder="Bus Name">
+<input type="number" id="busPrice" placeholder="Seat Price">
+
+<button onclick="addBus()">Add Bus</button>
+
+<h3>Bus List</h3>
+<ul id="busList"></ul>
+
+<script src="admin.js"></script>
+</body>
+</html>
