@@ -902,10 +902,9 @@ function getErrorMessage(err) {
   return "Something went wrong.";
 }
 
-module.exports = {
-  app,
-  sanitizeBooking,
-  calculateTotalAmount,
-  calculateAmountInPaise,
-  NIKAM_BUSES,
-};
+module.exports = app;
+module.exports.app = app;
+module.exports.sanitizeBooking = sanitizeBooking;
+module.exports.calculateTotalAmount = calculateTotalAmount;
+module.exports.calculateAmountInPaise = calculateAmountInPaise;
+module.exports.NIKAM_BUSES = NIKAM_BUSES;
