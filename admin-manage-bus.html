@@ -14,13 +14,6 @@
 
 <body>
 
-    <!-- ===== LOGIN PROTECTION ===== -->
-    <script>
-        if (localStorage.getItem("adminLogged") !== "true") {
-            window.location.replace("admin-login.html");
-        }
-    </script>
-
     <!-- ===== HEADER ===== -->
     <header class="admin-header">
         <div class="header-left">
@@ -42,18 +35,25 @@
 
         <section class="dashboard-card">
             <div class="card-header">
-                <h3>Lower Deck</h3>
-                <span class="deck-label">20 Seats</span>
+                <h3>Active Demo Buses</h3>
+                <span class="deck-label">Validated route dataset</span>
             </div>
-            <div id="lowerSeats" class="seat-box"></div>
-        </section>
-
-        <section class="dashboard-card">
-            <div class="card-header">
-                <h3>Upper Deck</h3>
-                <span class="deck-label">20 Seats</span>
-            </div>
-            <div id="upperSeats" class="seat-box"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bus</th>
+                        <th>Bus Number</th>
+                        <th>Route</th>
+                        <th>Timing</th>
+                        <th>Distance</th>
+                        <th>Type</th>
+                        <th>Seat Type</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="busTable"><tr><td colspan="9">Loading...</td></tr></tbody>
+            </table>
         </section>
 
     </main>

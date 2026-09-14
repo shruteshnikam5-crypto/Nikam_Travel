@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nikam Travel | Premium Bus Booking</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -116,15 +117,15 @@
   <p>© 2026 Nikam Travel. All Rights Reserved.</p>
 </footer>
 
-<!-- ================= SCRIPT ================= -->
+<script src="data.js"></script>
 <script>
 function goToBooking(e){
   e.preventDefault();
 
-  if(localStorage.getItem("isLoggedIn") !== "true"){
-    window.location.href = "login.html";
-  } else {
+  if(getNikamSession()){
     window.location.href = "route.html";
+  } else {
+    window.location.href = "login.html?next=route.html";
   }
 }
 </script>

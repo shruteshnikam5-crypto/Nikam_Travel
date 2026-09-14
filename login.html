@@ -1,161 +1,157 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nikam Travel | Secure Login</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header class="header">
-  <h2>🚌 Nikam Travel</h2>
-  <nav>
-    <a href="index.html">Home</a>
+  <h2>Nikam Travel</h2>
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
   </nav>
 </header>
 
 <section class="auth-pro">
-
   <div class="auth-left">
-    <h1>Welcome Back 👋</h1>
-    <p>Secure login & instant booking experience.</p>
+    <h1>Welcome Back</h1>
+    <p>Secure login and instant booking experience.</p>
     <img src="pexels-safi-erneste-18029609.jpg" alt="Bus">
   </div>
 
   <div class="auth-box">
     <div class="form-slider" id="formSlider">
-
-      <!-- REGISTER -->
       <form class="auth-form">
         <h2>Create Account</h2>
-
         <input type="text" id="rname" placeholder="Full Name" required>
-        <input type="number" id="rage" placeholder="Age" required>
+        <input type="number" id="rage" placeholder="Age" min="18" required>
         <input type="tel" id="rmobile" placeholder="Mobile Number" required>
         <input type="email" id="remail" placeholder="Email Address" required>
         <input type="password" id="rpassword" placeholder="Password" required>
-
         <button type="button" onclick="registerUser()">Register</button>
-
-        <p>Already have account?
-          <span onclick="slideToLogin()">Login</span>
-        </p>
+        <p>Already have account? <span onclick="slideToLogin()">Login</span></p>
       </form>
 
-      <!-- LOGIN -->
       <form class="auth-form">
         <h2>Login Account</h2>
-
         <input type="tel" id="lmobile" placeholder="Mobile Number" required>
         <input type="password" id="lpassword" placeholder="Password" required>
-
         <button type="button" onclick="loginUser()">Login</button>
-
-        <p>Don't have account?
-          <span onclick="slideToRegister()">Register</span>
-        </p>
+        <p>Don't have account? <span onclick="slideToRegister()">Register</span></p>
       </form>
-
     </div>
   </div>
-
 </section>
 
 <footer class="footer">
   <p>© 2026 Nikam Travel. All Rights Reserved.</p>
 </footer>
 
+<script src="data.js"></script>
 <script>
+const nikamNextPage = new URLSearchParams(window.location.search).get("next") || "route.html";
 
-/* 🔥 AUTO REDIRECT IF ALREADY LOGGED IN */
-if(localStorage.getItem("isLoggedIn") === "true"){
-  window.location.href = "route.html";
+if (getNikamSession()) {
+  window.location.href = nikamNextPage;
 }
 
-/* ===== SLIDER ===== */
 function slideToLogin() {
-  document.getElementById('formSlider').style.transform = 'translateX(-400px)';
+  document.getElementById("formSlider").style.transform = "translateX(-50%)";
 }
 
 function slideToRegister() {
-  document.getElementById('formSlider').style.transform = 'translateX(0)';
+  document.getElementById("formSlider").style.transform = "translateX(0)";
 }
 
-/* ===== REGISTER ===== */
-function registerUser() {
-
+async function registerUser() {
   const name = document.getElementById("rname").value.trim();
-  const age = parseInt(document.getElementById("rage").value);
+  const age = Number(document.getElementById("rage").value);
   const mobile = document.getElementById("rmobile").value.trim();
-  const email = document.getElementById("remail").value.trim();
+  const email = document.getElementById("remail").value.trim().toLowerCase();
   const password = document.getElementById("rpassword").value;
 
   if (!name || !age || !mobile || !email || !password) {
-    alert("Fill all fields ⚠️");
+    alert("Please fill all fields.");
     return;
   }
 
-  if (age < 18) {
-    alert("Age must be 18+ ❌");
+  if (!Number.isInteger(age) || age < 18) {
+    alert("Age must be 18 or above.");
     return;
   }
 
-  if (mobile.length !== 10) {
-    alert("Enter valid 10 digit mobile number ❌");
+  if (!isValidNikamMobile(mobile)) {
+    alert("Enter a valid 10 digit mobile number.");
     return;
   }
 
-  if (password.length < 4) {
-    alert("Password must be at least 4 characters ❌");
+  if (!isValidNikamEmail(email)) {
+    alert("Enter a valid email address.");
     return;
   }
 
-  // 🔥 Prevent duplicate user
-  if(localStorage.getItem("user")){
-    alert("User already registered ⚠️");
+  if (!isStrongNikamPassword(password)) {
+    alert("Password must be at least 6 characters.");
     return;
   }
 
-  const user = { name, age, mobile, email, password };
-  localStorage.setItem("user", JSON.stringify(user));
+  try {
+    const response = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, age, mobile, email, password })
+    });
+    const result = await response.json();
 
-  alert("Registration Successful ✅");
-  slideToLogin();
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Registration failed.");
+    }
+
+    const users = readNikamUsers().filter((user) => user.mobile !== mobile && user.email !== email);
+    users.push(result.user);
+    saveNikamUsers(users);
+    alert("Registration successful. Please login.");
+    slideToLogin();
+  } catch (err) {
+    alert(err.message || "Registration failed. Please check server.");
+  }
 }
 
-/* ===== LOGIN ===== */
-function loginUser() {
-
+async function loginUser() {
   const mobile = document.getElementById("lmobile").value.trim();
   const password = document.getElementById("lpassword").value;
 
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  if (!user) {
-    alert("No account found. Please register first ❌");
+  if (!isValidNikamMobile(mobile) || !password) {
+    alert("Enter mobile number and password.");
     return;
   }
 
-  if (user.mobile === mobile && user.password === password) {
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mobile, password })
+    });
+    const result = await response.json();
 
-    // ✅ Save session
-    localStorage.setItem("isLoggedIn", "true");
+    if (!response.ok || !result.success) {
+      throw new Error(result.message || "Invalid mobile number or password.");
+    }
 
-    // ✅ Save user data
-    localStorage.setItem("userName", user.name);
-    localStorage.setItem("userEmail", user.email);
-    localStorage.setItem("userAge", user.age);
-
-    alert("Login Successful ✅");
-
-    window.location.href = "route.html";
-
-  } else {
-    alert("Invalid Mobile or Password ❌");
+    setNikamSession(result.user);
+    setNikamAuthToken(result.token);
+    alert("Login successful.");
+    window.location.href = nikamNextPage;
+  } catch (err) {
+    alert(err.message || "Login failed. Please check server.");
   }
 }
-
 </script>
-
 </body>
 </html>

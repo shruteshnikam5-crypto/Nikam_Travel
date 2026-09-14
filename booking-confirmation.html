@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation | Nikam Travel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="header">
+  <h2>Nikam Travel</h2>
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="route.html">Book Ticket</a>
+      <a href="mybookings.html">My Bookings</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="admin-btn" onclick="logout()">Logout</a>
+    </div>
+  </nav>
+</header>
+
+<section class="confirm">
+  <h1>Booking Confirmed</h1>
+  <div class="ticket" id="ticketBox"></div>
+  <button class="home-btn" onclick="downloadTicket()">Download Ticket</button>
+  <button class="home-btn" onclick="window.print()">Print Ticket</button>
+  <button class="whatsapp-btn" onclick="shareTicket()">WhatsApp Share</button>
+  <br>
+  <a href="mybookings.html" class="home-btn">View My Bookings</a>
+</section>
+
+<script src="data.js"></script>
+<script>
+const customer = requireNikamCustomer();
+const booking = JSON.parse(localStorage.getItem(NIKAM_KEYS.lastBooking) || "null");
+
+if (!booking) {
+  window.location.href = "mybookings.html";
+}
+
+function ticketRows(b) {
+  const seats = Array.isArray(b.seats) ? b.seats.join(", ") : "-";
+  return `
+    <h3>NIKAM TRAVEL</h3>
+    <table>
+      <tr><th>Booking ID</th><td>${escapeNikamHtml(b.bookingId || b.id)}</td></tr>
+      <tr><th>Passenger</th><td>${escapeNikamHtml(b.passengerName || b.name)}</td></tr>
+      <tr><th>Mobile</th><td>${escapeNikamHtml(b.mobile || "-")}</td></tr>
+      <tr><th>Email</th><td>${escapeNikamHtml(b.email || "-")}</td></tr>
+      <tr><th>Bus</th><td>${escapeNikamHtml(b.busName)} (${escapeNikamHtml(b.busNumber)})</td></tr>
+      <tr><th>Route</th><td>${escapeNikamHtml(b.from)} -> ${escapeNikamHtml(b.to)}</td></tr>
+      <tr><th>Date</th><td>${escapeNikamHtml(b.travelDate)}</td></tr>
+      <tr><th>Time</th><td>${escapeNikamHtml(b.departureTime)} -> ${escapeNikamHtml(b.arrivalTime)}</td></tr>
+      <tr><th>Seats</th><td>${escapeNikamHtml(seats)} (${escapeNikamHtml(b.seatType || "-")})</td></tr>
+      <tr><th>Amount Paid</th><td>Rs.${escapeNikamHtml(b.totalAmount || 0)}</td></tr>
+      <tr><th>Payment</th><td>${escapeNikamHtml(b.paymentStatus || "-")}</td></tr>
+      <tr><th>Status</th><td>${escapeNikamHtml(b.bookingStatus || "-")}</td></tr>
+    </table>
+  `;
+}
+
+function shareText(b) {
+  const seats = Array.isArray(b.seats) ? b.seats.join(", ") : "-";
+  return `Nikam Travel Ticket
+
+Booking ID: ${b.bookingId || b.id}
+Passenger Name: ${b.passengerName || b.name}
+Bus Name: ${b.busName}
+Bus Number: ${b.busNumber}
+From: ${b.from}
+To: ${b.to}
+Travel Date: ${b.travelDate}
+Departure: ${b.departureTime}
+Arrival: ${b.arrivalTime}
+Seats: ${seats}
+Total Amount: Rs.${b.totalAmount}
+Payment Status: ${b.paymentStatus}`;
+}
+
+function downloadTicket() {
+  const blob = new Blob([shareText(booking)], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `${booking.bookingId || "nikam-ticket"}.txt`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function shareTicket() {
+  window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(shareText(booking)), "_blank");
+  window.location.href = "index.html";
+}
+
+function logout(){
+  clearNikamSession();
+  window.location.href = "index.html";
+}
+
+document.getElementById("ticketBox").innerHTML = ticketRows(booking);
+</script>
+</body>
+</html>

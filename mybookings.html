@@ -1,59 +1,131 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Bookings | Nikam Travel</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <header class="header">
-  <h2>🚌 My Bookings</h2>
-  <a href="index.html" class="home-btn">Home</a>
+  <h2>Nikam Travel</h2>
+  <nav class="nav">
+    <div class="nav-left">
+      <a href="index.html">Home</a>
+      <a href="route.html">Book Ticket</a>
+      <a href="contact.html">Contact</a>
+      <a href="mybookings.html" class="active">My Bookings</a>
+    </div>
+    <div class="nav-right">
+      <a href="#" class="admin-btn" onclick="logoutNikamCustomer()">Logout</a>
+    </div>
+  </nav>
 </header>
 
 <section class="route">
-
-  <h1>Your Tickets 🎫</h1>
-
+  <h1>Your Tickets</h1>
   <div id="bookingList"></div>
-
 </section>
 
+<script src="data.js"></script>
 <script>
-
-// 🔐 LOGIN CHECK
-if(localStorage.getItem("isLoggedIn") !== "true"){
-  window.location.href = "login.html";
-}
-
-// 📊 LOAD BOOKINGS
-const data = JSON.parse(localStorage.getItem("bookings")) || [];
+const customer = requireNikamCustomer();
 const container = document.getElementById("bookingList");
+let loadedBookings = [];
 
-if(data.length === 0){
-  container.innerHTML = "<h3>No bookings yet 😢</h3>";
-}else{
-  data.forEach(b => {
-    const div = document.createElement("div");
-    div.className = "bus-card";
+if (customer) loadMyBookings();
 
-    div.innerHTML = `
-      <h3>${b.bus}</h3>
-      <p><b>Name:</b> ${b.name}</p>
-      <p><b>Email:</b> ${b.email}</p>
-      <p><b>Bus No:</b> ${b.busNo}</p>
-      <p><b>Time:</b> ${b.time}</p>
-      <p><b>Seats:</b> ${b.seats.join(", ")}</p>
-      <p><b>Total:</b> ₹${b.total}</p>
-      <p><b>Date:</b> ${b.date}</p>
-    `;
+async function loadMyBookings() {
+  try {
+    container.innerHTML = "<h3>Loading...</h3>";
+    const response = await fetch("/api/my-bookings", {
+      headers: { Authorization: `Bearer ${getNikamAuthToken()}` }
+    });
+    const result = await response.json();
 
-    container.appendChild(div);
-  });
+    if (!response.ok || !result.success) {
+      if (response.status === 401) {
+        clearNikamSession();
+        window.location.href = "login.html?next=mybookings.html";
+        return;
+      }
+      throw new Error(result.message || "Unable to load bookings.");
+    }
+
+    loadedBookings = result.bookings || [];
+    container.innerHTML = "";
+
+    if (!loadedBookings.length) {
+      container.innerHTML = "<h3>No bookings yet</h3>";
+      return;
+    }
+
+    loadedBookings.forEach((booking) => container.appendChild(renderBookingCard(booking)));
+  } catch (err) {
+    container.innerHTML = `<h3>${escapeNikamHtml(err.message || "Unable to load bookings.")}</h3>`;
+  }
 }
 
-</script>
+function renderBookingCard(b) {
+  const div = document.createElement("div");
+  div.className = "bus-card booking-card";
+  const seats = Array.isArray(b.seats) ? b.seats.join(", ") : "-";
+  div.innerHTML = `
+    <h3>${escapeNikamHtml(b.bookingId || b.id)}</h3>
+    <p><b>Bus:</b> ${escapeNikamHtml(b.busName || "-")} (${escapeNikamHtml(b.busNumber || "-")})</p>
+    <p><b>Route:</b> ${escapeNikamHtml(b.from || "-")} -> ${escapeNikamHtml(b.to || "-")}</p>
+    <p><b>Travel Date:</b> ${escapeNikamHtml(b.travelDate || "-")}</p>
+    <p><b>Departure:</b> ${escapeNikamHtml(b.departureTime || "-")}</p>
+    <p><b>Seats:</b> ${escapeNikamHtml(seats)}</p>
+    <p><b>Amount:</b> Rs.${escapeNikamHtml(b.totalAmount || 0)}</p>
+    <p><b>Payment:</b> ${escapeNikamHtml(b.paymentStatus || "-")}</p>
+    <p><b>Status:</b> ${escapeNikamHtml(b.bookingStatus || "-")}</p>
+    <div class="booking-actions">
+      <button type="button" onclick="viewTicket('${escapeNikamHtml(b.id)}')">View Ticket</button>
+      <button type="button" onclick="downloadTicket('${escapeNikamHtml(b.id)}')">Download Ticket</button>
+      <button type="button" onclick="printTicket('${escapeNikamHtml(b.id)}')">Print</button>
+      <button type="button" onclick="shareTicket('${escapeNikamHtml(b.id)}')">WhatsApp</button>
+    </div>
+  `;
+  return div;
+}
 
+function getBookingById(id) {
+  return loadedBookings.find((booking) => String(booking.id) === String(id));
+}
+
+function bookingText(b) {
+  const seats = Array.isArray(b.seats) ? b.seats.join(", ") : "-";
+  return `Nikam Travel Ticket\n\nBooking ID: ${b.bookingId || b.id}\nPassenger Name: ${b.passengerName || b.name}\nBus Name: ${b.busName}\nBus Number: ${b.busNumber}\nFrom: ${b.from}\nTo: ${b.to}\nTravel Date: ${b.travelDate}\nDeparture: ${b.departureTime}\nArrival: ${b.arrivalTime}\nSeats: ${seats}\nTotal Amount: Rs.${b.totalAmount}\nPayment Status: ${b.paymentStatus}`;
+}
+
+function viewTicket(id) {
+  const booking = getBookingById(id);
+  if (!booking) return;
+  localStorage.setItem(NIKAM_KEYS.lastBooking, JSON.stringify(booking));
+  window.location.href = "booking-confirmation.html";
+}
+
+function downloadTicket(id) {
+  const booking = getBookingById(id);
+  if (!booking) return;
+  const blob = new Blob([bookingText(booking)], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `${booking.bookingId || "nikam-ticket"}.txt`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function printTicket(id) {
+  viewTicket(id);
+}
+
+function shareTicket(id) {
+  const booking = getBookingById(id);
+  if (!booking) return;
+  window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(bookingText(booking)), "_blank");
+}
+</script>
 </body>
 </html>

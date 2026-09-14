@@ -1,69 +1,48 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard | Nikam Travel</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Admin CSS -->
-    <link rel="stylesheet" href="admin.css">
+  <meta charset="UTF-8">
+  <title>Admin Dashboard | Nikam Travel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="admin.css">
 </head>
-
 <body>
+<header class="admin-header">
+  <div class="header-left"><h2>Nikam Travel - Admin</h2></div>
+  <div class="header-right"><button class="logout-btn" onclick="logout()">Logout</button></div>
+</header>
 
-    <!-- ===== HEADER ===== -->
-    <header class="admin-header">
-        <div class="header-left">
-            <h2>🛠 Nikam Travel - Admin</h2>
-        </div>
+<nav class="admin-nav">
+  <a href="admin-dashboard.html" class="active">Dashboard</a>
+  <a href="admin-manage-bus.html">Buses</a>
+  <a href="admin-bookings.html">Bookings</a>
+</nav>
 
-        <div class="header-right">
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-    </header>
+<main class="admin-content">
+  <div class="dashboard-card">
+    <h3>Welcome Admin</h3>
+    <p>Manage buses, routes, payments, tickets and customer bookings from one place.</p>
+  </div>
 
-    <!-- ===== NAVIGATION ===== -->
-    <nav class="admin-nav">
-        <a href="admin-dashboard.html" class="active">Dashboard</a>
-        <a href="admin-manage-bus.html">Manage Bus</a>
-        <a href="admin-bookings.html">Bookings</a>
-    </nav>
+  <div class="dashboard-grid" id="dashboardStats">
+    <div class="card"><h4>Loading</h4><p>Please wait...</p></div>
+  </div>
 
-    <!-- ===== MAIN CONTENT ===== -->
-    <main class="admin-content">
-        
-        <div class="dashboard-card">
-            <h3>Welcome Admin 👋</h3>
-            <p>
-                From here you can manage buses, control seat availability, 
-                and monitor customer bookings.
-            </p>
-        </div>
+  <div class="dashboard-grid">
+    <div class="card">
+      <h4>Buses & Routes</h4>
+      <p>Review active buses, route details, timings, seat type and pricing.</p>
+      <a href="admin-manage-bus.html" class="card-btn">Go</a>
+    </div>
+    <div class="card">
+      <h4>Bookings & Payments</h4>
+      <p>Check customer bookings, payment status and ticket records.</p>
+      <a href="admin-bookings.html" class="card-btn">Go</a>
+    </div>
+  </div>
+</main>
 
-        <div class="dashboard-grid">
-            
-            <div class="card">
-                <h4>🚌 Manage Buses</h4>
-                <p>Add, edit or control bus seats.</p>
-                <a href="admin-manage-bus.html" class="card-btn">Go</a>
-            </div>
-
-            <div class="card">
-                <h4>📑 View Bookings</h4>
-                <p>Check all customer bookings.</p>
-                <a href="admin-bookings.html" class="card-btn">Go</a>
-            </div>
-
-        </div>
-
-    </main>
-
-    <!-- ===== FOOTER ===== -->
-    <footer class="admin-footer">
-        <p>© 2026 Nikam Travel Admin Panel</p>
-    </footer>
-
-    <script src="admin.js"></script>
-
+<footer class="admin-footer"><p>© 2026 Nikam Travel Admin Panel</p></footer>
+<script src="admin.js"></script>
 </body>
 </html>

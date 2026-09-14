@@ -1,0 +1,32 @@
+[
+  {
+    "id": "USER-9820340412",
+    "name": "Codex Demo User",
+    "age": 22,
+    "mobile": "9820340412",
+    "email": "codex203404@example.com",
+    "passwordHash": "b5692500175fad6bb2b306aa20ff58423c79b130ef310fb3caa924e0f28bc61d",
+    "status": "ACTIVE",
+    "registeredAt": "2026-09-14T15:04:05.075Z"
+  },
+  {
+    "id": "USER-9720365034",
+    "name": "Flow Demo User",
+    "age": 24,
+    "mobile": "9720365034",
+    "email": "flow203650@example.com",
+    "passwordHash": "b5692500175fad6bb2b306aa20ff58423c79b130ef310fb3caa924e0f28bc61d",
+    "status": "ACTIVE",
+    "registeredAt": "2026-09-14T15:06:50.710Z"
+  },
+  {
+    "id": "USER-7888272887",
+    "name": "SHRUTESH SANTOSH NIKAM",
+    "age": 24,
+    "mobile": "7888272887",
+    "email": "shruteshnikam9@gmail.com",
+    "passwordHash": "d5bf4d5d9b6af3db23d4c800494f8501e74bfcce74911091b90e1fc569477649",
+    "status": "ACTIVE",
+    "registeredAt": "2026-09-14T15:10:13.573Z"
+  }
+]

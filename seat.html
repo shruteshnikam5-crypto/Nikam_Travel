@@ -1,203 +1,292 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nikam Travel | Seat Selection</title>
   <link rel="stylesheet" href="./style.css">
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
-<body>
+<body class="seat-page">
+<header class="topbar">Nikam Travel - Seat Selection</header>
 
-<header class="topbar">
-  🚌 Nikam Travel – Seat Selection
-</header>
+<main class="seat-page-main">
+  <h1 class="title">Seat Selection</h1>
 
-<h1 class="title">AC Sleeper (2+1)</h1>
-
-<div class="seat-container">
-
-  <div class="deck">
-    <h2>Lower Deck</h2>
-    <div class="seats" id="lower"></div>
+  <div class="legend seat-legend" aria-label="Seat status legend">
+    <span><span class="box available"></span>Available</span>
+    <span><span class="box selected"></span>Selected</span>
+    <span><span class="box booked"></span>Booked</span>
   </div>
 
-  <div class="deck">
-    <h2>Upper Deck</h2>
-    <div class="seats" id="upper"></div>
+  <div class="seat-container">
+    <div class="deck">
+      <h2>Lower Deck</h2>
+      <div class="seats" id="lower"></div>
+    </div>
+    <div class="deck" id="upperDeckWrap">
+      <h2>Upper Deck</h2>
+      <div class="seats" id="upper"></div>
+    </div>
   </div>
 
-</div>
+  <div class="summary" aria-label="Booking summary">
+    <div class="trip-summary" id="tripSummary"></div>
+    <h3>Bus: <span id="busTitle">-</span></h3>
+    <h3>Seat Price: Rs.<span id="seatPriceLabel">0</span></h3>
+    <div class="passenger-form">
+      <h3>Passenger Details</h3>
+      <input type="text" id="passengerName" placeholder="Passenger Name" required>
+      <input type="tel" id="passengerMobile" placeholder="Mobile Number" required>
+      <input type="email" id="passengerEmail" placeholder="Email Address" required>
+      <input type="number" id="passengerAge" placeholder="Age" min="18" required>
+    </div>
+    <h3>Seats: <span id="seatList">None</span></h3>
+    <h3>Seat Count: <span id="seatCount">0</span></h3>
+    <h3>Subtotal: Rs.<span id="subtotal">0</span></h3>
+    <h3>Taxes/Fees: Rs.<span id="fees">0</span></h3>
+    <h2>Total: Rs.<span id="total">0</span></h2>
+    <button class="confirm-btn" id="payButton" onclick="confirmBooking()">Pay & Book</button>
+    <button type="button" class="secondary-booking-btn" onclick="window.location.href='mybookings.html'">View My Bookings</button>
+  </div>
+</main>
 
-<div class="summary">
-  <h3>Seats: <span id="seatList">None</span></h3>
-  <h2>Total: ₹<span id="total">0</span></h2>
+<footer class="footer seat-footer">
+  <p>© 2026 Nikam Travel. All Rights Reserved.</p>
+</footer>
 
-  <button class="confirm-btn" onclick="confirmBooking()">
-    Pay & Book 💳
-  </button>
-
-  <br><br>
-
-  <button onclick="window.location.href='mybookings.html'">
-    View My Bookings
-  </button>
-</div>
-
+<script src="data.js"></script>
 <script>
+const customer = requireNikamCustomer();
+const state = getNikamBookingState();
+const bus = state && state.bus ? findNikamBus(state.bus.id) : null;
+const travelDate = state && state.travelDate;
+const selected = new Set(Array.isArray(state?.seats) ? state.seats : []);
+let booked = new Set();
 
-const price = 8;
-const lower = document.getElementById("lower");
-const upper = document.getElementById("upper");
-const seatList = document.getElementById("seatList");
-const total = document.getElementById("total");
+const lowerDeck = document.getElementById("lower");
+const upperDeck = document.getElementById("upper");
+const upperWrap = document.getElementById("upperDeckWrap");
+const payButton = document.getElementById("payButton");
 
-let selectedSeats = [];
-
-/* 🔐 LOGIN CHECK */
-const userName = localStorage.getItem("userName");
-const userEmail = localStorage.getItem("userEmail");
-
-if (!userName || !userEmail || localStorage.getItem("isLoggedIn") !== "true") {
-  alert("Please login first!");
-  window.location.href = "login.html";
+if (customer && (!state || !bus || !travelDate)) {
+  alert("Please select a bus and travel date first.");
+  window.location.href = "route.html";
 }
 
-/* 🚌 BUS DETAILS */
-const busName = localStorage.getItem("selectedBus") || "Nikam Express";
-const travelDate = localStorage.getItem("travelDate") || new Date().toLocaleDateString();
-const busTime = localStorage.getItem("busTime") || "09:00 PM - 05:00 AM";
-const distance = localStorage.getItem("distance") || "300 km";
-const busNumber = "MH12AB1234";
+if (bus) {
+  document.querySelector(".title").textContent = `${bus.seatType} (${bus.type})`;
+  document.getElementById("busTitle").textContent = `${bus.name} - ${bus.busNumber}`;
+  document.getElementById("seatPriceLabel").textContent = bus.price;
+  document.getElementById("tripSummary").innerHTML = `
+    <h3>${escapeNikamHtml(bus.from)} -> ${escapeNikamHtml(bus.to)}</h3>
+    <p>Date: ${escapeNikamHtml(travelDate)}</p>
+    <p>Departure: ${escapeNikamHtml(bus.departureTime)} | Arrival: ${escapeNikamHtml(bus.arrivalTime)}</p>
+    <p>Duration: ${escapeNikamHtml(bus.duration)} | Distance: ${escapeNikamHtml(bus.distance)}</p>
+    <p>Bus Type: ${escapeNikamHtml(bus.type)} | Seat Type: ${escapeNikamHtml(bus.seatType)}</p>
+  `;
+  document.getElementById("passengerName").value = state.passenger?.name || customer.name || "";
+  document.getElementById("passengerMobile").value = state.passenger?.mobile || customer.mobile || "";
+  document.getElementById("passengerEmail").value = state.passenger?.email || customer.email || "";
+  document.getElementById("passengerAge").value = state.passenger?.age || customer.age || "";
+  loadBookedSeats().then(renderSeats).catch((err) => {
+    alert(err.message || "Booked seats could not be loaded.");
+    renderSeats();
+  });
+}
 
-/* 🪑 CREATE SEATS */
-function createSeats(container, prefix) {
-  for (let i = 1; i <= 20; i++) {
+async function loadBookedSeats() {
+  const params = new URLSearchParams({ busNumber: bus.busNumber, travelDate });
+  const response = await fetch("/api/booked-seats?" + params.toString());
+  if (!response.ok) throw new Error("Booked seats could not be loaded. Please check server.");
+  const seats = await response.json();
+  booked = new Set(Array.isArray(seats) ? seats : []);
+}
 
+function renderSeats() {
+  lowerDeck.innerHTML = "";
+  upperDeck.innerHTML = "";
+  renderDeck(lowerDeck, "L", 20);
+  if (bus.decks.includes("Upper Deck")) {
+    upperWrap.style.display = "";
+    renderDeck(upperDeck, "U", 20);
+  } else {
+    upperWrap.style.display = "none";
+  }
+  updateSummary();
+}
+
+function renderDeck(container, prefix, count) {
+  for (let index = 1; index <= count; index += 1) {
+    const seatName = `${prefix}${index}`;
     const seat = document.createElement("div");
     seat.className = "seat";
-    seat.innerText = prefix + i;
-
-    // demo random booked seats
-    if (Math.random() < 0.15) {
-      seat.classList.add("booked");
-    }
-
-    seat.onclick = () => {
-      if (seat.classList.contains("booked")) return;
-
-      seat.classList.toggle("selected");
-
-      const name = seat.innerText;
-
-      if (selectedSeats.includes(name)) {
-        selectedSeats = selectedSeats.filter(s => s !== name);
-      } else {
-        selectedSeats.push(name);
-      }
-
-      updateSummary();
-    };
-
+    seat.textContent = seatName;
+    if (booked.has(seatName)) seat.classList.add("booked");
+    if (selected.has(seatName) && !booked.has(seatName)) seat.classList.add("selected");
+    seat.onclick = () => toggleSeat(seatName, seat);
     container.appendChild(seat);
   }
 }
 
-/* 📊 UPDATE SUMMARY */
-function updateSummary() {
-  seatList.innerText = selectedSeats.length ? selectedSeats.join(", ") : "None";
-  total.innerText = selectedSeats.length * price;
+function toggleSeat(seatName, element) {
+  if (booked.has(seatName)) return;
+  if (selected.has(seatName)) {
+    selected.delete(seatName);
+    element.classList.remove("selected");
+  } else {
+    selected.add(seatName);
+    element.classList.add("selected");
+  }
+  updateSummary();
 }
 
-/* 💳 PAYMENT + BOOKING */
-async function confirmBooking() {
+function getPassenger() {
+  return {
+    name: document.getElementById("passengerName").value.trim(),
+    mobile: document.getElementById("passengerMobile").value.trim(),
+    email: document.getElementById("passengerEmail").value.trim().toLowerCase(),
+    age: Number(document.getElementById("passengerAge").value)
+  };
+}
 
-  if (selectedSeats.length === 0) {
-    alert("Select at least one seat!");
+function validatePassenger(passenger) {
+  if (!passenger.name) return "Passenger name is required.";
+  if (!isValidNikamMobile(passenger.mobile)) return "Enter a valid 10 digit mobile number.";
+  if (!isValidNikamEmail(passenger.email)) return "Enter a valid email address.";
+  if (!Number.isInteger(passenger.age) || passenger.age < 18) return "Passenger age must be 18 or above.";
+  return "";
+}
+
+function updateSummary() {
+  const seats = Array.from(selected).filter((seat) => !booked.has(seat));
+  const subtotal = seats.length * bus.price;
+  document.getElementById("seatList").textContent = seats.length ? seats.join(", ") : "None";
+  document.getElementById("seatCount").textContent = String(seats.length);
+  document.getElementById("subtotal").textContent = String(subtotal);
+  document.getElementById("fees").textContent = "0";
+  document.getElementById("total").textContent = String(subtotal);
+  setNikamBookingState({ ...state, userId: customer.id, bus, travelDate, seats, passenger: getPassenger() });
+}
+
+async function confirmBooking() {
+  const seats = Array.from(selected).filter((seat) => !booked.has(seat));
+  const passenger = getPassenger();
+  const validation = validatePassenger(passenger);
+
+  if (validation) {
+    alert(validation);
     return;
   }
 
-  const totalAmount = selectedSeats.length * price;
+  if (!seats.length) {
+    alert("Select at least one seat.");
+    return;
+  }
+
+  if (payButton.dataset.processing === "true") return;
+  payButton.dataset.processing = "true";
+  payButton.disabled = true;
+  payButton.textContent = "Creating order...";
 
   const bookingData = {
-    name: userName,
-    email: userEmail,
-    busNumber: busNumber,
-    travelDate: travelDate,
-    seats: selectedSeats,
-    totalAmount: totalAmount
+    userId: customer.id,
+    passengerName: passenger.name,
+    name: passenger.name,
+    email: passenger.email,
+    mobile: passenger.mobile,
+    age: passenger.age,
+    busId: bus.id,
+    travelDate,
+    seats,
+    totalAmount: seats.length * bus.price
   };
 
   try {
-
-    // 🔥 1. CREATE ORDER
-    const res = await fetch("/api/create-order", {
+    const orderResponseRaw = await fetch("/api/create-order", {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({ amount: totalAmount })
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getNikamAuthToken()}`
+      },
+      body: JSON.stringify({ bookingData })
     });
+    const orderResponse = await orderResponseRaw.json();
 
-    const order = await res.json();
-
-    // 🔥 2. RAZORPAY OPEN
-    const options = {
-      key: "rzp_test_SaEwY3yCcRHU8m", // 👉 replace this
-      amount: order.amount,
-      currency: "INR",
-      name: "Nikam Travels",
-      description: "Bus Ticket Booking",
-      order_id: order.id,
-
-      handler: async function (response) {
-
-        // 🔥 3. VERIFY PAYMENT
-        const verify = await fetch("/api/verify-payment", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({
-            ...response,
-            bookingData
-          })
-        });
-
-        const result = await verify.json();
-
-        if (result.success) {
-
-          // 📱 WhatsApp AFTER PAYMENT
-          const message =
-`🚌 Nikam Travel Ticket
-
-Name: ${userName}
-Bus: ${busName}
-Seats: ${selectedSeats.join(", ")}
-Total: ₹${totalAmount}
-Date: ${travelDate}`;
-
-          window.open("https://api.whatsapp.com/send?text=" + encodeURIComponent(message));
-
-          alert("✅ Payment Successful & Booking Confirmed!");
-          window.location.href = "mybookings.html";
-
-        } else {
-          alert("❌ Payment verification failed");
-        }
+    if (!orderResponseRaw.ok || !orderResponse.success) {
+      if (orderResponseRaw.status === 401) {
+        clearNikamSession();
+        window.location.href = "login.html?next=seat.html";
+        return;
       }
-    };
+      throw new Error(orderResponse.message || "Payment order was not created.");
+    }
 
-    const rzp = new Razorpay(options);
+    const order = orderResponse.order;
+    if (Number(order.amount) !== bookingData.totalAmount * 100) {
+      throw new Error("Payment amount mismatch. Please select seats again.");
+    }
+
+    if (orderResponse.demoPayment) {
+      if (!confirm(`Demo payment: Confirm booking for Rs.${bookingData.totalAmount}?`)) {
+        resetPayButton();
+        return;
+      }
+      await verifyPayment({ razorpay_order_id: order.id, razorpay_payment_id: `pay_demo_${Date.now()}`, razorpay_signature: "demo_signature" });
+      return;
+    }
+
+    const rzp = new Razorpay({
+      key: orderResponse.keyId,
+      amount: order.amount,
+      currency: order.currency,
+      name: "Nikam Travel",
+      description: `${bus.name} ticket booking`,
+      order_id: order.id,
+      prefill: { name: passenger.name, email: passenger.email, contact: passenger.mobile },
+      theme: { color: "#d32f2f" },
+      handler: verifyPayment,
+      modal: { ondismiss: resetPayButton }
+    });
+    rzp.on("payment.failed", function (response) {
+      alert(response.error.description || "Payment failed.");
+      resetPayButton();
+    });
     rzp.open();
-
   } catch (err) {
-    console.error(err);
-    alert("⚠️ Payment error");
+    alert(err.message || "Payment error. Please check server.");
+    resetPayButton();
   }
 }
 
-/* 🚀 INIT */
-createSeats(lower, "L");
-createSeats(upper, "U");
+async function verifyPayment(response) {
+  payButton.textContent = "Verifying payment...";
+  const verify = await fetch("/api/verify-payment", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getNikamAuthToken()}`
+    },
+    body: JSON.stringify(response)
+  });
+  const result = await verify.json();
 
+  if (!verify.ok || !result.success) {
+    alert(result.message || "Payment verification failed.");
+    resetPayButton();
+    return;
+  }
+
+  localStorage.setItem(NIKAM_KEYS.lastBooking, JSON.stringify(result.booking));
+  clearNikamBookingState();
+  window.location.href = "booking-confirmation.html";
+}
+
+function resetPayButton() {
+  payButton.dataset.processing = "false";
+  payButton.disabled = false;
+  payButton.textContent = "Pay & Book";
+}
 </script>
-
 </body>
 </html>
